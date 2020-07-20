@@ -1,0 +1,42 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the action will run. Triggers the workflow on push or pull request
+# events but only for the master branch
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+    # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+    - uses: actions/checkout@v2
+
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v1.5.0
+      with:
+        # SDK version to use. Examples: 2.2.104, 3.1, 3.1.x
+        dotnet-version: 3.1
+        # Optional package source for which to set up authentication. Will consult any existing NuGet.config in the root of the repo and provide a temporary NuGet.config using the NUGET_AUTH_TOKEN environment variable as a ClearTextPassword
+        # source-url: # optional
+        # Optional OWNER for using packages from GitHub Package Registry organizations/users other than the current repository's owner. Only used if a GPR URL is also provided in source-url
+        # owner: # optional
+      
+    - name: Build and publish app to ./publish directory in Release mode
+      run: dotnet publish --configuration Release -o $GITHUB_WORKSPACE/publish
+
+    - name: Run app by generated EXE binary
+      run: $GITHUB_WORKSPACE/publish/hello-world
+
+    - name: Run app by generated DLL binary
+      run: dotnet $GITHUB_WORKSPACE/publish/hello-world.dll
