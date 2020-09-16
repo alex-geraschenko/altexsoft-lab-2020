@@ -1,4 +1,7 @@
 ﻿using System;
+using HomeTask4.Core.Entities;
+using HomeTask4.Infrastructure.Extensions;
+using HomeTask4.SharedKernel.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -24,8 +27,9 @@ namespace HomeTask4.Cmd
         static void Main(string[] args)
         {
             var host = Host.CreateDefaultBuilder(args)
-                .ConfigureServices(config =>
+                .ConfigureServices(services =>
                 {
+                    services.AddInfrastructure();
                 })
                 .ConfigureLogging(config =>
                 {
@@ -37,6 +41,21 @@ namespace HomeTask4.Cmd
             var logger = host.Services.GetRequiredService<ILogger<Program>>();
 
             logger.LogInformation("Hello World!");
+
+            logger.LogDebug("Trying to get repository...");
+            var repository = host.Services.GetRequiredService<IRepository>();
+
+            try
+            {
+                logger.LogDebug("Trying to get temp entity...");
+                var entity = repository.GetByIdAsync<TempEntity>(1);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error occurred durign getting temp entity");
+            }
+
+            logger.LogInformation("Good bye!");
 
             Console.ReadLine();
         }
