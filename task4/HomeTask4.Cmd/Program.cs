@@ -2,6 +2,7 @@
 using HomeTask4.Core.Entities;
 using HomeTask4.Infrastructure.Extensions;
 using HomeTask4.SharedKernel.Interfaces;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -26,29 +27,19 @@ namespace HomeTask4.Cmd
     {
         static void Main(string[] args)
         {
-            var host = Host.CreateDefaultBuilder(args)
-                .ConfigureServices(services =>
-                {
-                    services.AddInfrastructure();
-                })
-                .ConfigureLogging(config =>
-                {
-                    config.ClearProviders();
-                    config.AddConsole();
-                })
-                .Build();
+            var host = CreateHostBuilder(args).Build();
 
             var logger = host.Services.GetRequiredService<ILogger<Program>>();
 
             logger.LogInformation("Hello World!");
 
             logger.LogDebug("Trying to get repository...");
-            var repository = host.Services.GetRequiredService<IRepository>();
+            var unitOfWork = host.Services.GetRequiredService<IUnitOfWork>();
 
             try
             {
                 logger.LogDebug("Trying to get temp entity...");
-                var entity = repository.GetByIdAsync<TempEntity>(1);
+                var entity = unitOfWork.Repository.GetByIdAsync<TempEntity>(1);
             }
             catch (Exception ex)
             {
@@ -59,5 +50,23 @@ namespace HomeTask4.Cmd
 
             Console.ReadLine();
         }
+
+        /// <summary>
+        /// This method should be separate to support EF command-line tools in design time
+        /// https://docs.microsoft.com/en-us/ef/core/miscellaneous/cli/dbcontext-creation
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns><see cref="IHostBuilder" /> hostBuilder</returns>
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder(args)
+               .ConfigureServices((context, services) =>
+               {
+                   services.AddInfrastructure(context.Configuration.GetConnectionString("Default"));
+               })
+               .ConfigureLogging(config =>
+               {
+                   config.ClearProviders();
+                   config.AddConsole();
+               });
     }
 }
