@@ -1,3 +1,4 @@
+using HomeTask4.Infrastructure.Data.Config;
 using Microsoft.EntityFrameworkCore;
 
 namespace HomeTask4.Infrastructure.Data
@@ -12,6 +13,8 @@ namespace HomeTask4.Infrastructure.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.ApplyConfiguration(new TempEntityConfig());
         }
     }
 }
