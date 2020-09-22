@@ -33,10 +33,4 @@ jobs:
         # owner: # optional
       
     - name: Build and publish app to ./publish directory in Release mode
-      run: dotnet publish --configuration Release -o $GITHUB_WORKSPACE/publish
-
-    - name: Run app by generated EXE binary
-      run: $GITHUB_WORKSPACE/publish/hello-world
-
-    - name: Run app by generated DLL binary
-      run: dotnet $GITHUB_WORKSPACE/publish/hello-world.dll
+      run: dotnet build task4/HomeTask4.sln --configuration Release
