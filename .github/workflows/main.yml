@@ -31,6 +31,8 @@ jobs:
         # source-url: # optional
         # Optional OWNER for using packages from GitHub Package Registry organizations/users other than the current repository's owner. Only used if a GPR URL is also provided in source-url
         # owner: # optional
-      
+    - name: Run unit tests
+      run: dotnet test task4/tests/**/*.csproj
+
     - name: Build and publish app to ./publish directory in Release mode
       run: dotnet build task4/HomeTask4.sln --configuration Release
